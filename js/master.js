@@ -1,12 +1,4 @@
-MathJax = {
-  tex: {inlineMath: [['$', '$'], ['\\(', '\\)']]},
-  startup: {
-    ready: function () {
-      MathJax.startup.defaultReady();
-      document.getElementById('render').disabled = false;
-    }
-  }
-}
+
 
 function convert() {
   //
