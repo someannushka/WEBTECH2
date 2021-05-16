@@ -1,0 +1,88 @@
+Project:
+
+  Project includes frontend and backend parts:
+    Frontend includes:
+      + CSS|JS framework UIkit3
+      + JQuery plugin
+      + MathJax plugin for math viewing on pages
+    Backend includes:
+      + Database to storage teacher and student information, questions and answers data.
+        Made to collect all test (questions|answers) data and users meta information.
+        Database called `tests_db` contains following tables:
+        - `teachers` with teacher's login and MD5-hashed password
+        - `tests` with tests details (such as status, time limit, hash for usage and name).
+        - `questions` contains all questions meta information (in JSON decoded format as there are different types of questions).
+        - `students` contains students first and last names and test ID.
+        - `student_meta` contains students meta information such as status of test (finished or not).
+        - `answers` contains answers meta information and uploads (for questions with uploads), aslo partly in JSON decoded format.
+      + API is only for AJAX requests from frontend.
+        Method name and parameters are sent via POST.
+        API method:
+        - check_login ('login') - checks if login is free
+        - update_test ('test_id', 'name', 'hash', 'active', 'time_limit') - updates test
+        - delete_test ('test_id') - deletes test
+        - delete_question ('question_id') - deletes question
+        - check_test ('hash') - checks if test is actual
+        - update_answer ('student_id', 'question_id', 'answer') - updates/adds answer on specified question
+        - upload_file ('student_id', 'question_id', 'upload') - adds file on specified answer
+        - update_scores ('student_id', 'question_id', 'scores') - updates scores on specified answer
+      + PDF handler (FPDF library):
+        It helps to form and save PDF with students results. It includes all questions and answers.
+      + CSV handler (built-in PHP functions):
+        It helps to form and save CSV with students results. Includes only statistics on results.
+_____________________________________________________________________________________________________
+
+About log-in:
+  + Teachers use login and password to log in. Page handler compares it with info in DB and determine if user is valid.
+  + Students use test hash and their name to log in and start test. It is important that frontend sends AJAX to API (method 'check_test') to check if test hash is valid.
+    Student is allowed to start test only if test hash is valid.
+
+About registration:
+  + Teachers use login and password to register. Frontend sends AJAX to API (method 'chech_login') to check if login if free to use.
+
+About test management:
+  + Tests could be created, edited and deleted.
+  + Tests are visible only for teacher who created them and for students on frontend (only with hash).
+    Tests are invisible for students if they were set to inactive status.
+    Test name is also visible to students.
+  + There is bulk deletion functionality for tests. Performed via AJAX request to API (method 'delete_test')
+
+About questions management:
+  + Questions could be created, edited and deleted.
+  + There is bulk deletion functionality for questions. Performed via AJAX request to API (method 'delete_question')
+  + There are 5 alternative question types to use. They could be selected when editing test.
+    Although some parameters differ, description, maximum scores, order fields are common for all types.
+  + There is order field to set order of question in the test (in questions page they are sorted by that parameter).
+  + For different question there are different validation scripts to check if parameters are valid (all of them are mostly in master.js).
+  + There is math editor and it uses TeX notation to input math equations.
+
+About test processing:
+  + Students could see countdown timer on header of the site. Restarting the page will not change timer as it is server checked.
+  + All answers are saved (via AJAX, method 'update_answer') when student makes any changes to fields, so teacher can track student actions from answers dashboard.
+  + All attachments are saved (via AJAX, method 'upload_file') when student upload any.
+  + Test is automatically finishes when it is expired (JS setTimeout every time on page reload).
+  + Test scores are calculated after the test finish.
+
+About answers dashboard:
+  + Each test has its own answers dashboard.
+  + Teacher have access only to their own test results
+  + Answer scores saved automatically (via AJAX, method 'update_scores').
+  + Teacher can see attachments by checking certain buttons (one for each attachment).
+  + Teacher could upload all test results in CSV (only statistics) and PDF (with questions|answers) formats.
+_____________________________________________________________________________________________________
+
+System is made to prevent data corruption or loss during test or in teacher dashboard, so many things are checked on each reload and link following:
+especially if it is test owner, if question is really of that test and so on.
+
+There are 3 main handlers in system:
+includes/db_handler.php (class DB_HANDLE) - establish database connection and performs all CRUD actions with database.
+includes/api_handler.php (class API_HANDLE) - handles API request and requires also database connection.
+includes/page_handler.php (class PAGES_HANDLE) - main page handle and it uses both api_handler and db_handler to perform his actions.
+
+Some words about question in tests:
+   + Each question is included from separate file:
+     - in student's frontend - from pages/exam,
+     - in teacher's answer dashboard - from pages/check,
+     - during PDF creation - from includes/pdf_types
+   + Each question has its own handlers on fields (change and upload), so handlers would not mix up.
+   + Each question saves its data in different formats, so there different algorithms when automatically calculating results after test.
