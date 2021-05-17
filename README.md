@@ -4,7 +4,7 @@
 - Student side +-
 - Cheking answers (Teacher side)
 - DB problem : pages_handler
-- dokumentation
+- documentation
 ______________________
 smth else
 /16.
