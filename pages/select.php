@@ -37,8 +37,18 @@
             </div>
         </div>
         </a>
-      </div>
+      </div>	
 
     </div>
+    <div>
+        <a href="index.php?part=doc" class="card-link">
+          <div class="uk-card uk-card-default uk-card-hover uk-height-medium">
+            <div class="uk-card-body uk-card-large">
+                <h3 class="uk-card-title">Documentation</h3>
+                <p>Our documentation of the project.</p>
+            </div>
+        </div>
+        </a>
+      </div>
   </div>
 </div>

@@ -44,11 +44,11 @@
               $counter++;
               $meta = json_decode($item['meta']);
 
-              include('pages/type_1.php');
-              include('pages/type_2.php');
-              include('pages/type_3.php');
-              include('pages/type_4.php');
-              include('pages/type_5.php');
+              include('pages/exam/type_1.php');
+              include('pages/exam/type_2.php');
+              include('pages/exam/type_3.php');
+              include('pages/exam/type_4.php');
+              include('pages/exam/type_5.php');
 
             }
       ?>
@@ -62,7 +62,29 @@
       <script>
         let timer = setTimeout(function(){
           document.location.href = 'index.php?part=expired';
-        }, <?php echo $this->countdown - time(); ?> * 1000)
+        }, <?php echo $this->countdown - time(); ?> * 1000);
+
+        $(document).ready(function() {
+          window.onblur = function(event) {
+            var form_data = new FormData();
+            form_data.append('method', 'leaved');
+            form_data.append('student_id', '<?php echo $this->current_user['info']['id']; ?>');
+
+            $.ajax({
+                  url:     "api/methods.php",
+                  type:     "POST",
+                  data: form_data,
+                  processData: false,
+                  contentType: false,
+                  success: function(response) {
+                  },
+                  error: function(response) {
+                  }
+            });
+            console.log('Пользователь покинул вкладку');
+          }
+        });
+
       </script>
 
       </fieldset>

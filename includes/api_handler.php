@@ -4,8 +4,8 @@ class API_HANDLE{
 
   protected $db;
   // public $upload_dir = 'C://WEB/localhost/tests_project/images/';
-  public $upload_dir = '/home/xkhoma/public_html/tests_project/includes';
-  public $upload_dir_base = '/home/xkhoma/public_html/';
+  public $upload_dir = '/home/xkhoma/public_html/tests_project/images/';
+  public $upload_dir_base = '/home/xkhoma/public_html';
 
 
   function __construct($db_handler){
@@ -139,16 +139,16 @@ class API_HANDLE{
     $student_id = isset($_POST['student_id']) ? (int) $_POST['student_id'] : false;
     $question_id = isset($_POST['question_id']) ? (int) $_POST['question_id'] : false;
     $answer = isset($_POST['answer']) ? $_POST['answer'] : false;
-    $upload = isset($_POST['upload']) ? $_POST['upload'] : false;
+    // $upload = isset($_POST['upload']) ? $_POST['upload'] : false;
 
     $message = [];
     if($student_id != false && $question_id != false && $answer != false){
       $answer_item = $this->db->get_answer_by_question_id($student_id, $question_id);
       if($answer_item){
-        $upload_new = $upload == false ? $answer_item['upload'] : $upload;
+        $upload_new = $answer_item['upload'];
         $this->db->update_answer($student_id, $question_id, $answer, $upload_new, time());
       } else {
-        $upload_new = $upload == false ? '' : $upload;
+        $upload_new = NULL;
         $this->db->add_answer($student_id, $question_id, $answer, $upload, time());
       }
       $message['success'] = true;
@@ -177,6 +177,13 @@ class API_HANDLE{
           if(move_uploaded_file($_FILES["upload"]["tmp_name"][0], $filename)){
             $upload_new[] = $filename;
           }
+        } else {
+          $upload_new = [];
+
+          $filename = $this->upload_dir . $student_id . "_" . $question_id . "_" . $_FILES["upload"]["name"][0];
+          if(move_uploaded_file($_FILES["upload"]["tmp_name"][0], $filename)){
+            $upload_new[] = $filename;
+          }
         }
         $this->db->update_answer($student_id, $question_id, $answer_item['answer'], json_encode($upload_new), time());
       } else {
@@ -198,6 +205,53 @@ class API_HANDLE{
     echo(json_encode($message));
 
   }
+
+  public function update_scores(){
+    $student_id = isset($_POST['student_id']) ? (int) $_POST['student_id'] : false;
+    $question_id = isset($_POST['question_id']) ? (int) $_POST['question_id'] : false;
+    $scores = isset($_POST['scores']) ? $_POST['scores'] : false;
+
+    $message = [];
+    if($student_id != false && $question_id != false && $scores != false){
+      $answer_item = $this->db->get_answer_by_question_id($student_id, $question_id);
+      if($answer_item){
+        $this->db->update_answer_scores($student_id, $question_id, (float) $scores);
+      }
+      $message['success'] = true;
+    } else {
+      $message['success'] = false;
+    }
+
+    $this->set_headers();
+    echo(json_encode($message));
+
+  }
+
+  public function leaved(){
+    $student_id = isset($_POST['student_id']) ? (int) $_POST['student_id'] : false;
+    $came_out = isset($_POST['came_out']) ? (int) $_POST['came_out'] : 1;
+
+    $message = [];
+    if($student_id != false){
+      $student_meta = $this->db->get_student_meta($student_id);
+      if($student_meta){
+        if($came_out == 1){
+          $came_out_new = $student_meta['came_out'] + 1;
+        } else if($came_out == 0){
+          $came_out_new = $student_meta['came_out'] - 1;
+        }
+        $this->db->update_student_meta($student_id, $student_meta['finished_test'], $came_out_new);
+      }
+      $message['success'] = true;
+    } else {
+      $message['success'] = false;
+    }
+
+    $this->set_headers();
+    echo(json_encode($message));
+
+  }
+
 
 };
 

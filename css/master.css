@@ -1,0 +1,38 @@
+.uk-card-media-top > img {
+	min-height: 16rem;
+	object-fit: cover;
+}
+
+.card-link:hover {
+	text-decoration: none !important;
+}
+
+.custom-padding {
+	padding-left: 40px !important;
+	padding-right: 40px !important;
+	padding-bottom: 30px !important;
+}
+
+.uk-navbar-nav > li > a {
+	text-transform: none !important;
+}
+
+#update_test, #update_question, .edit_test, .edit_question{
+	background-color: #32d296 !important;
+}
+
+.status-active {
+	background-color: #32d296 !important;
+}
+
+.status-disabled {
+	background-color: #f0506e !important;
+}
+
+.checkbox_answers {
+	display: block !important;
+}
+
+.uk-lightbox-items > .uk-active {
+	background-color: #fff !important;
+}

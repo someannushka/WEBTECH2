@@ -12,7 +12,9 @@
   // delete_test ('test_id') - deletes test
   // delete_question ('question_id') - deletes question
   // check_test ('hash') - checks if test is actual
-  // update_answer ('student_id', 'question_id', 'answer', 'upload') - updates/adds answer on specified question
+  // update_answer ('student_id', 'question_id', 'answer') - updates/adds answer on specified question
+  // upload_file ('student_id', 'question_id', 'upload') - adds file on specified answer
+  // update_scores ('student_id', 'question_id', 'scores') - updates scores on specified answer
 
   $method = isset($_REQUEST['method']) ? $_REQUEST['method'] : NULL;
 
@@ -47,6 +49,14 @@
 
     case 'upload_file':
       $api->upload_file();
+      break;
+
+    case 'update_scores':
+      $api->update_scores();
+      break;
+
+    case 'leaved':
+      $api->leaved();
       break;
 
     default:

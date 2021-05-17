@@ -88,6 +88,7 @@
                   <!-- <th>ID</th> -->
                   <th class="uk-table-expand">Type</th>
                   <th>Description</th>
+                  <th>Maximum scores</th>
                   <th>Modified</th>
                   <th>Edit</th>
                 </tr>
@@ -95,6 +96,7 @@
             <tbody>
               <?php
                 $questions = $this->db->get_questions($this->current_test['id']);
+                $max_scores = 0;
 
                 foreach($questions as $question){
                   $type = '';
@@ -124,6 +126,7 @@
                     <!-- <td><?php echo $question['id']; ?></td> -->
                     <td><?php echo $type; ?></td>
                     <td><?php echo $question['description']; ?></td>
+                    <td><?php $meta = json_decode($question['meta']); if(isset($meta->scores)){echo $meta->scores; $max_scores += $meta->scores;} ?></td>
                     <td><?php echo date("d.m.Y H:i:s ", $question['created']); ?></td>
                     <td><a class="uk-button uk-button-primary edit_question" href="index.php?part=edit_question&test_id=<?php echo $this->current_test['id']; ?>&question_id=<?php echo $question['id']; ?>">Edit question</a></td>
                   </tr>
@@ -135,7 +138,77 @@
       </li>
 
       <!-- Answers section -->
-      <!-- <li>Bazinga!</li> -->
+      <li>
+
+        <a href="<?php echo $this->create_csv("test_" . $this->current_test['id'] . "_results.csv", $this->current_test['id']); ?>" class="uk-button uk-button-default">Download CSV</a>
+        <a href="<?php echo $this->create_pdf("test_" . $this->current_test['id'] . "_results.pdf", $this->current_test['id']); ?>" class="uk-button uk-button-default">Download PDF</a>
+
+        <table class="uk-table uk-table-divider uk-table-middle">
+            <caption>Student's answers</caption>
+            <thead>
+                <tr>
+                  <th>First name</th>
+                  <th>Last name</th>
+                  <th>Finished</th>
+                  <th>Changed page</th>
+                  <th>Started</th>
+                  <th>Scores</th>
+                  <th>Edit</th>
+                </tr>
+            </thead>
+            <tbody>
+              <?php
+                $students = $this->db->get_students($this->current_test['id']);
+
+                foreach($students as $student){
+                  $student_meta = $this->db->get_student_meta($student['id']);
+                  if($student_meta){
+                    $finished = $student_meta['finished_test'] == true ? 'Finished' : 'In process';
+                    if( ($student_meta['finished_test'] == 0 && (time() - $student['created'] ) > $this->current_test['time_limit'] * 60) || ( ($student_meta['came_out'] > 0) && ($student_meta['finished_test'] == 0)) ){
+                      $finished = 'Leaved';
+                    }
+                    $came_out = $student_meta['came_out'] > 0 ? "Yes" : "No";
+
+                  } else {
+                    if( (time() - $student['created']) >= $this->current_test['time_limit'] * 60){
+                      $finished = 'Finished';
+                    } else {
+                      $finished = 'In process';
+                    }
+
+                    $came_out = 'No';
+                  }
+
+                  $answers = $this->db->get_answers($student['id']);
+                  $current_scores = 0;
+                  foreach($answers as $answer){
+                    if($answer['scores'] != NULL){
+                      $current_scores += $answer['scores'];
+                    }
+                  }
+
+                  if($current_scores == 0){
+                    $this->calculate_scores($student['id']);
+                  }
+
+                  ?>
+                  <tr>
+                    <td><?php echo $student['first_name']; ?></td>
+                    <td><?php echo $student['last_name']; ?></td>
+                    <td><?php echo $finished; ?></td>
+                    <td><?php echo $came_out; ?></td>
+                    <td><?php echo date("d.m.Y H:i:s ", $student['created']); ?></td>
+                    <td><?php echo $current_scores . " / " . $max_scores; ?></td>
+                    <td><a class="uk-button uk-button-primary edit_answer" href="index.php?part=edit_answer&student_id=<?php echo $student['id']; ?>">Show answer</a></td>
+                  </tr>
+                  <?php
+
+                }
+               ?>
+            </tbody>
+        </table>
+
+      </li>
     </ul>
 
   </div>

@@ -16,6 +16,7 @@
     protected $conn;
     protected $teachers_table = 'teachers';
     protected $students_table = 'students';
+    protected $students_meta_table = 'student_meta';
     protected $tests_table = 'tests';
     protected $questions_table = 'questions';
     protected $answers_table = 'answers';
@@ -325,6 +326,58 @@
       $query->bindParam(":answer", $answer);
       $query->bindParam(":upload", $upload);
       $query->bindParam(":created", $created);
+
+      $query->execute();
+
+    }
+
+    public function update_answer_scores($student_id, $question_id, $scores){
+      $query = $this->conn->prepare("UPDATE $this->answers_table SET
+                                             scores = :scores
+                                             WHERE student_id LIKE :student_id
+                                             AND question_id LIKE :question_id;");
+
+      $query->bindParam(":student_id", $student_id);
+      $query->bindParam(":question_id", $question_id);
+      $query->bindParam(":scores", $scores);
+
+      $query->execute();
+
+    }
+
+    public function get_student_meta($student_id){
+      $query = $this->conn->prepare("SELECT * FROM $this->students_meta_table WHERE student_id LIKE :student_id;");
+      $query->bindParam(":student_id", $student_id);
+
+      if($query->execute()){
+        return $query->fetch();
+      }
+    }
+
+    public function add_student_meta($student_id, $finished_test, $came_out){
+      $query = $this->conn->prepare("INSERT INTO $this->students_meta_table SET
+                                             student_id = :student_id,
+                                             finished_test = :finished_test,
+                                             came_out = :came_out;");
+
+      $query->bindParam(":student_id", $student_id);
+      $query->bindParam(":finished_test", $finished_test);
+      $query->bindParam(":came_out", $came_out);
+
+      $query->execute();
+
+      return $this->conn->lastInsertId();
+    }
+
+    public function update_student_meta($student_id, $finished_test, $came_out){
+      $query = $this->conn->prepare("UPDATE $this->students_meta_table SET
+                                             finished_test = :finished_test,
+                                             came_out = :came_out
+                                             WHERE student_id LIKE :student_id;");
+
+      $query->bindParam(":student_id", $student_id);
+      $query->bindParam(":finished_test", $finished_test);
+      $query->bindParam(":came_out", $came_out);
 
       $query->execute();
 

@@ -64,9 +64,9 @@ $(document).ready(function() {
     $('#render').click(function(){
       convert();
     });
-    if($('#render')){
-      convert();
-    }
+    // if($('#render')){
+    //   convert();
+    // }
     // End
 
     $('#register_login').change(function(e){
@@ -134,7 +134,7 @@ $(document).ready(function() {
 
       e.preventDefault();
 
-      $.when($('[type="checkbox"]:checked').each(function(index){
+      $('[type="checkbox"]:checked').each(function(index){
         var form_data = new FormData();
         form_data.append('method', 'delete_test');
         form_data.append('test_id', $(this).val());
@@ -150,7 +150,8 @@ $(document).ready(function() {
               error: function(response) {
               }
         });
-      })).then(function(){document.location.href = 'index.php?part=tests';});
+      });
+      var timer_del = setTimeout(function(){document.location.href = 'index.php?part=tests';}, 15000);
 
 
     });
@@ -159,7 +160,7 @@ $(document).ready(function() {
 
       e.preventDefault();
 
-      $.when($('.delete-question:checked').each(function(index){
+      $('.delete-question:checked').each(function(index){
         var form_data = new FormData();
         form_data.append('method', 'delete_question');
         form_data.append('question_id', $(this).val());
@@ -175,7 +176,9 @@ $(document).ready(function() {
               error: function(response) {
               }
         });
-      })).then(function(){document.location.href = 'index.php?part=edit_test&test_id=' + $('[name="test_id"]').val();});
+      });
+
+      var timer_del = setTimeout(function(){document.location.href = 'index.php?part=edit_test&test_id=' + $('[name="test_id"]').val();}, 15000);
     });
 
 
@@ -227,7 +230,8 @@ $(document).ready(function() {
         'pairs_answer': $('[name="pairs_answer"]').val().trim(),
         'json_open_answer': $('[name="json_open_answer"]').val().trim(),
         'json_checkbox_answer': $('[name="json_checkbox_answer"]').val().trim(),
-        'json_pairs_answer': $('[name="json_pairs_answer"]').val().trim()
+        'json_pairs_answer': $('[name="json_pairs_answer"]').val().trim(),
+        'scores': $('[name="scores"]').val().trim()
       };
 
       form_data.append('meta', JSON.stringify(meta));

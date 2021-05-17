@@ -20,6 +20,8 @@
 <div class="uk-section">
   <div class="uk-container">
 
+    <?php $meta = json_decode($this->current_question['meta']); ?>
+
     <button id='update_question' class="uk-button uk-button-primary">Save</button>
     <div id="success_message" class="uk-placeholder uk-text-success" style="display:none;">
       Your changes are successfully saved!
@@ -37,6 +39,13 @@
         <label class="uk-form-label" for="sorted">Order (number of question in test):</label>
         <div class="uk-form-controls">
           <input class="uk-input" name="sorted" type="number" min="0" step="1" max="100" value="<?php echo $this->current_question['sorted']; ?>">
+        </div>
+      </div>
+
+      <div class="uk-margin">
+        <label class="uk-form-label" for="scores">Maximum score:</label>
+        <div class="uk-form-controls">
+          <input class="uk-input" name="scores" type="number" min="0" step="1" max="100" value="<?php if(isset($meta->scores)){echo $meta->scores;} else {echo 0;} ; ?>">
         </div>
       </div>
 
@@ -82,7 +91,6 @@
       </div>
 
       <!-- Meta section -->
-      <?php $meta = json_decode($this->current_question['meta']); ?>
 
       <!-- Open answer section -->
       <div id="open_answer_section" class="uk-margin" style="<?php if($this->current_question['type'] != '1'){echo "display:none;";} ?>">
@@ -94,7 +102,13 @@
               }
              ?></textarea>
         </div>
-        <input type="text" name="json_open_answer" value="<?php echo $meta->json_open_answer; ?>" hidden>
+        <?php if(!isset($meta->json_open_answer)){
+          ?>
+          <input type="text" name="json_open_answer" value="" hidden>
+          <?php
+        } else { ?>
+          <input type="text" name="json_open_answer" value="<?php echo $meta->json_open_answer; ?>" hidden>
+        <?php } ?>
       </div>
 
       <!-- Checkbox answer section -->
@@ -115,7 +129,15 @@
               }
              ?></textarea>
         </div>
-        <input type="text" name="json_checkbox_answer" value="<?php echo $meta->json_checkbos_answer; ?>" hidden>
+        <?php if(!isset($meta->json_checkbox_answer)){
+          ?>
+          <input type="text" name="json_checkbox_answer" value="" hidden>
+          <?php
+        } else {
+          ?>
+          <input type="text" name="json_checkbox_answer" value="<?php echo $meta->json_checkbox_answer; ?>" hidden>
+          <?php
+        }?>
       </div>
 
       <!-- Pairs answer section -->
@@ -136,7 +158,13 @@
               }
              ?></textarea>
         </div>
-        <input type="text" name="json_pairs_answer" value="<?php echo $meta->json_pairs_answer; ?>" hidden>
+        <?php if(!isset($meta->json_pairs_answer)){
+          ?>
+          <input type="text" name="json_pairs_answer" value="" hidden>
+          <?php
+        } else { ?>
+          <input type="text" name="json_pairs_answer" value="<?php echo $meta->json_pairs_answer; ?>" hidden>
+        <?php } ?>
 
       </div>
 

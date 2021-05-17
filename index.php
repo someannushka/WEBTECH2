@@ -35,6 +35,7 @@
     <?php
       include_once('includes/db_handler.php');
       include_once('includes/api_handler.php');
+      include_once('includes/fpdf/fpdf.php');
       include_once('includes/pages_handler.php');
 
       $db = new DB_HANDLE($db_host, $db_name, $db_user, $db_password);
